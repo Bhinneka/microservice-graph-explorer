@@ -63,13 +63,10 @@ var StatusPage = React.createClass({
   },
 
   onWebsocketMessage: function(message) {
-    // console.log("message received");
-    // console.log(message);
-
     // Make sure the message we received is for this page
     var messageState = message.state;
     if (messageState.protocol == this.props.params.protocol &&
-        messageState.host == this.props.params.host &&
+        messageState.host.replace("@", "/") == this.props.params.host.replace("@", "/") &&
         messageState.dependencies == this.props.params.path) {
 
       switch (message.responseType) {
@@ -157,7 +154,7 @@ var StatusPage = React.createClass({
   sendState: function(forceRefresh) {
     SocketService.sendRequest({
       protocol: this.props.params.protocol,
-      host: this.props.params.host,
+      host: this.props.params.host.replace("@", "/"),
       dependencies: this.props.params.path,
       forceRefresh: forceRefresh
     });
@@ -175,12 +172,11 @@ var StatusPage = React.createClass({
   },
 
   render() {
-
-    var key = this.props.params.protocol + "-" + this.props.params.host + "-" + this.props.params.path;
+    var key = this.props.params.protocol + "-" + this.props.params.host.replace("@", "/") + "-" + this.props.params.path;
     var pageKey = key + "-page";
     var appStatusKey = key + "-app-status";
     var protocol = this.props.params.protocol;
-    var host = this.props.params.host;
+    var host = this.props.params.host.replace("@", "/");
     var url = protocol + "://" + host;
     var warningText = "Server disconnected - click to reconnect...";
     var warningClass = "crit";
@@ -193,7 +189,8 @@ var StatusPage = React.createClass({
     var historytoRender = this.state.history;
     if (this.state.windowWidth <= 320) {
       historytoRender = this.sliceHistory(16);
-    } if (this.state.windowWidth <= 640) {
+    }
+    if (this.state.windowWidth <= 640) {
       historytoRender = this.sliceHistory(32);
     }
 
@@ -214,7 +211,7 @@ var StatusPage = React.createClass({
       <Page className="statusPage" key={pageKey}>
         {websocketConnectionWarning}
         <HistoryList key="historyList" history={historytoRender} router={this.props.router} />
-        <Breadcrumbs router={this.props.router} host={host} protocol={protocol} path={this.props.params.path} /> {refresh}
+        <Breadcrumbs router={this.props.router} host={host.replace("/", "@")} protocol={protocol} path={this.props.params.path} /> {refresh}
         {this.props.children}
         <ApplicationStatus key={appStatusKey} router={this.props.router} url={url} isLoading={this.state.isLoading} isError={this.state.isError} errorMessage={this.state.errorMessage} status={this.state.status} children={this.props.children} />
       </Page>
