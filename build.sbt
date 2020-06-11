@@ -22,3 +22,5 @@ maintainer := "Adam Arsenault"
 
 // exposing the play ports
 dockerExposedPorts in Docker := Seq(9000, 9443)
+
+resolvers += "Scalaz Bintray Repo" at "http://dl.bintray.com/scalaz/releases"
